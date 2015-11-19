@@ -1,0 +1,18 @@
+{
+  "name": "test-backpack",
+  "version": "1.0.0",
+  "description": "Test Interchange capable backpack",
+  "main": "backpack.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "test",
+    "johnny-five",
+    "interchange",
+    "nodebots",
+    "I2C"
+  ],
+  "author": "Andrew Fisher <ajfisher.td@gmail.com>",
+  "license": "MIT"
+}
