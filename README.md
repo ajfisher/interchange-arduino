@@ -57,6 +57,8 @@ You will need to include the `interchange-arduino/src` files into your project
 and bring them in as part of your build steps. In this case we'll use grunt
 to demonstrate this process.
 
+### Make a build pipeline
+
 Assuming you have a file called `backpack.ino` at `src/controller` the first thing
 to do is make a build pipeline that copies your files from the controller and
 libs directories to a build directory to compile from.
@@ -98,6 +100,8 @@ properly each time.
 
 From there you should now be able to compile your `.ino` file from the Arduino
 IDE and it should compile properly.
+
+### Using Interchange in your backpack sketch
 
 To make the Interchange library available you should include it into your
 `src/controller/backpack.ino` file. Somewhere near the top of the file add the
@@ -154,4 +158,53 @@ AFTER the interchange.h include has been made (this will redefine the pin).
 You should also provide a `FIRMWARE_VERSION` as a #define to provide the version
 of your firmware so it can be provided to the user properly.
 
-If you aren't in config mode 
+If you aren't in config mode you'll be in RUNNING state and you can see there's
+some logic which determines if you should be using a custom address (this can
+be set by the user if they want to override the default) and then it drops through
+to picking up the set one or a given `DEFAULT_I2C_SENSOR_ADDRESS` which should
+also be `#define`d in your code.
+
+Once the I2C address is determined it will start the I2C wire library and you can
+set the `onRequest()` and `onResponse()` handler appropriately.
+
+## Example application
+
+The example application is available in [the examples folder](/examples). It is
+designed to simply output the value of the current running time of the arduino
+in seconds since boot each time it's requested.
+
+Files in use:
+
+* `Gruntfile.js` provides the copy and build tasks to build the sketch
+* `firmware/*` provides the src, build and bin folders according to the notes given
+above. Noting that the `libs` component of this is being picked up from the root
+`src` folder.
+* `firmware/src/testBackpack.ino` contains the sketch.
+* `package.json` is used to install the various dependencies for node.
+* `backpack.js` is a nodeJS script designed to talk to the backpack.
+* `manifest.json` is an Interchange manifest file with the backpack details in it.
+
+To use:
+
+```sh
+cd examples
+npm install
+grunt compile
+# TODO this next bit for local install.
+interchange install --file=. -a <board> -p <port>
+```
+
+Where `<board>` is the board type you want to use being `uno|nano|pro-mini` and
+`<port>` is the path to the serial port, eg: `/dev/tty.usbmodem1411`.
+
+Wire up as shown in the diagram below:
+
+TODO: Make diagram properly
+
+Make sure you have an arduino with standardFirmata on it or else another
+Johnny-Five capable board and you will be able to talk to the test backpack using
+the instruction below:
+
+```
+node backpack.js
+```
