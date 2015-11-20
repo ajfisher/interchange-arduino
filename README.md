@@ -1,5 +1,9 @@
 # interchange-arduino
 
+![](https://img.shields.io/badge/version-0.0.1-blue.svg)
+![](https://img.shields.io/badge/status-Not%20ready-red.svg)
+![](https://img.shields.io/github/issues/ajfisher/interchange-arduino.svg)
+
 This repository contains the latest source files for the interchange library
 for arduino usage.
 
