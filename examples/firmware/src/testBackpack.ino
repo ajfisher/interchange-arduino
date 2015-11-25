@@ -76,18 +76,20 @@ void counter() {
 
 void requestData() {
 
-    // when we get a request for data we simply pass the fout bytes of the duration
+    // when we get a request for data we simply pass the four bytes of the duration
     // into the register map and then we write that back out on the wire.
     register_map[0] = duration >> 24;    //MSB
-    register_map[1] = duration & 0xFF0000  >> 16;
-    register_map[2] = duration & 0xFF00 >> 8;
+    register_map[1] = (duration & 0xFF0000)  >> 16;
+    register_map[2] = (duration & 0xFF00) >> 8;
     register_map[3] = duration & 0xFF;  //LSB
 
     // write out via I2C using the buffer
     Wire.write(register_map, REGISTER_MAP_SIZE);
 
 #if _DEBUG
-    Serial.print(F("rm: "));
+    Serial.print(F("DUR: "));
+    Serial.print(duration);
+    Serial.print(F(" rm: "));
     for (uint8_t i = 0; i< REGISTER_MAP_SIZE; i++) {
         Serial.print(register_map[i]);
         Serial.print(F(" "));
