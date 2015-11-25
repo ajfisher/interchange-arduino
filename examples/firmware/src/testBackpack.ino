@@ -1,9 +1,12 @@
 #include "interchange.h"
 
-#define FIRMWARE_VERSION "0.1.0"
-#define DEFAULT_I2C_SENSOR_ADDRESS 0x61
+// bring this in second to set any overrides or refefines of interchange behaviour
+// also allows for some defines etc as needed to deal with arduino's crazy
+// include behaviour
+#include "includes.h"
 
 byte register_map[REGISTER_MAP_SIZE];
+uint32_t duration = 0;
 
 void setup() {
 
@@ -57,34 +60,38 @@ void loop() {
     // manage this. If not then we can hand over to a function to do some work
     // in this case we call out to generate_couter()
     if (state == RUNNING) {
-        generate_counter();
+        counter();
         delay(1);
     } else if (state == CONFIG) {
         interchange_commands();
     }
 }
 
-void generate_counter() {
+void counter() {
     // simply increments a counter periodically that can be sent back to an
     // I2C request.
+    duration = millis() / 1000; // convert to seconds.
 }
 
 
 void requestData() {
 
-    // when we get a request for data we simply pass the two bytes of the duration
+    // when we get a request for data we simply pass the fout bytes of the duration
     // into the register map and then we write that back out on the wire.
-    register_map[0] = duration >> 8;    //MSB
-    register_map[1] = duration & 0xFF;  //LSB
+    register_map[0] = duration >> 24;    //MSB
+    register_map[1] = duration & 0xFF0000  >> 16;
+    register_map[2] = duration & 0xFF00 >> 8;
+    register_map[3] = duration & 0xFF;  //LSB
 
     // write out via I2C using the buffer
     Wire.write(register_map, REGISTER_MAP_SIZE);
 
 #if _DEBUG
-    Serial.print("rm: ");
-    Serial.print(register_map[0]);
-    Serial.print(" ");
-    Serial.print(register_map[1]);
+    Serial.print(F("rm: "));
+    for (uint8_t i = 0; i< REGISTER_MAP_SIZE; i++) {
+        Serial.print(register_map[i]);
+        Serial.print(F(" "));
+    }
     Serial.println();
 #endif
 }
